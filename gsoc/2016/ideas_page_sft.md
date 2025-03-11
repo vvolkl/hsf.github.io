@@ -1,0 +1,603 @@
+[CERN SFT Gsoc 2016 ideas page ]{property="dc:title"} {#cern-sft-gsoc-2016-ideas-page .page-header}
+=====================================================
+
+We participated in the Google Summer of Code with success each year
+since 2011, so we are applying again in 2016!\
+We intend to offer three options, as soon as the project ideas will be
+ready: pick one of the Project ideas which are grouped into categories,
+have a look to the section dedicated to [\'Blue sky\'](#bluesky) or
+propose your own great idea for this summer: we are looking forward to
+hearing about **your** perspectives. A list of our mentors (and their
+areas of expertise) can be found [here](#mentors).
+
+We encourage students who plan to apply to **[contact
+us](#contact) ** about their interest and explain their project ideas as
+early as possible. Our experience from our previous GSoC participation
+was that frequently an initial student application either needs to be
+reworked in close collaboration with a future mentor, or at least can
+benefit from feedback and discussion. **Please do not forget to provide
+us with some relevant information about yourself** (for example CV, past
+projects, personal page or blog, linkedin profile, github account,
+etc.).
+
+Before submitting an application please consult the [official GSoC
+FAQ](https://developers.google.com/open-source/gsoc/faq) where you can
+find some good advice on writing a successful application. The
+application should be submitted through the [GSoC Web
+page](https://summerofcode.withgoogle.com) before the **25th of March**.
+
+[Project ideas]{#project}
+=========================
+
+Geant Vector Prototype and Geant4 Simulation Toolkit
+----------------------------------------------------
+
+[Every LHC experiments is a large scale user of simulation, involving
+the elementary particles created by the LHC beam collisions and their
+path through its detectors. Almost half the CPU resources of each
+experiment (around 100,000 cores) are used constantly to produce
+simulated events. This is now done using t]{.s1}he
+[Geant4](geant4.cern.ch) toolkit, [the current production detector
+simulation toolkit for High Energy Physics (HEP) experiments.  R&D is
+being undertaken in the [GeantV](http://geant.web.cern.ch) project into
+a new generation of detector simulation, seeking to use existing \'large
+core\' hardware more efficiently, in order to meet the rapidly rising
+experiment simulation needs, and to be well adapted to other existing
+and planned architectures, including CPUs with larger vector registers
+and accelerators ( such as the Intel Xeon Phi & GPUs). ]{.s1}[The code
+required to model diverse types of particles and interactions, and to
+model the complex geometries of detectors is large. Due to this it
+overwhelms the caches of current CPUs, significantly reducing the
+efficiency of utilisation on today's hardware. This effort is focused on
+identifying ways to reorganise the work so that more data (e.g. multiple
+particles or rays) is processed by each function. By reusing the code on
+\'nearby\' data we aim to use the memory architectures of today's
+hardware better. At the same time we prepare the way to obtain good
+performance on tomorrow's hardware.]{.s1}\
+\
+Geant4 and GeantV are open source, developed by physicists and engineers
+from laboratories and universities around the world.  Developments are
+ongoing to improve its computing and physics precision, its scope of
+application, and to better utilize current and emerging computer
+architectures. The simulation programs of the LHC experiments are in
+constant large scale use, and the total number of simulated events
+produced is becoming a growing limitation in the analysis potential for
+some interesting types of new physics.\
+\
+As a result the goal of the project is to explore different ways to
+reduce the execution time on today's complex commodity CPUs, and to
+prototype how to use it efficiently on the many-core hardware of the
+future (tens, hundreds of cores, threads or 'warps'). The code required
+in Geant4 to model diverse types of particles and interactions, and to
+model the complex geometries of detectors spans hundreds of classes and
+tens to hundreds of thousands of lines of code. Due to this it
+overwhelms the caches of current CPUs, significantly reducing the
+efficiency of utilisation on today's hardware. [GeantV addresses these
+challenges by transporting together bunches of particles, in order to
+profit from the structure and parallelism in modern hardware, exploiting
+cacahce, vector instructions]{.s1} and multiple cores using
+multi-threading (MT).
+
+[**Implementation of task-based transport for GeantV**]{.s1}
+
+[Description: The current parallelism model of GeantV is data-oriented:
+a static set of threads handles its work, fetching one \"basket\" of
+tracks and transporting each track for a step. Threads are fed with work
+from a common input concurrent queue. After an injection of a set of
+initial tracks, further work is generated by the transport threads,
+which create new baskets at the end of each step. Each step can also
+generate a trace (or detector \'hit\'), which is proto-data for output.
+Other work will also go on, summarising the detector hits into detector
+summaries (\'digits\'), and performing its output.  We are seeking to
+adapt the steering of this work to a task-based approach, preferably
+using Thread Building Blocks (TBB), to profit the flexibility of this
+approach, and from the facilities provided by its powerful library.  A
+first TBB implementation exists based on an initial version of the
+GeantV scheduler, which serve as a starting point and potential
+inspiration.]{.s1}
+
+[**Task ideas and expected results**:  ]{.s1}
+
+-   [Evaluate the existing TBB-based implementation by identifying and
+    understanding its current bottlenecks, and comparing it to the
+    \'static\' thread approach. Expected outcome is a refined task-based
+    version, with improved performance from addressing the most
+    important bottlenecks.]{.s1}
+-   [Evaluate different approaches for structuring the tasks. Innovative
+    ideas will be welcome. ]{.s1}Expected outcome is a d[esign and
+    partial implementation of a second task-based implementation
+    targeting improved performance.]{.s1}
+
+[**Requirements**: Strong C++ skills, experience with parallel
+programming required. Experience in using TBB or other task-based
+threading libraries will be considered a strong advantage. Knowledge in
+the field of physics is a plus, but not a requirement.]{.s1}
+
+[**Mentor**: [Andrei
+Gheata](mailto:sft-gsoc-AT-cern-dot-ch?subject=Task-based%20GeantV%20Simulation)​]{.s1}
+
+[**Web page:**
+    [[http://geant.web.cern.ch]{.s2}](http://geant.web.cern.ch/)]{.s1}
+
+[**Source code**:
+ [[https://gitlab.cern.ch/GeantV/geant/tree/master]{.s2}](https://gitlab.cern.ch/GeantV/geant/tree/master)]{.s1}
+
+[**New methods for integrating trajectory in field**]{.s1}
+
+[Geant4 and GeantV use Runge-Kutta methods  to integrate the motion of
+charged particles in a non-uniform electromagnetic field.  Methods must
+provide good integration accuracy for the integration and to cost a
+minimum of computation time.  Integration is used to identify the
+intersection point between the curved track and the volume
+boundaries.  Due to the large number of steps and the cost of the
+evaluations of the field, the integration and intersection are a
+performance critical part of detector simulation. Recent work has
+introduced new RK methods which reduce the number of field evaluations
+required, and has the potential to decreased the computation time.]{.s1}
+
+[**Task ideas:**]{.s1}
+
+-   [Introduce multi-step integration methods and compare their
+    performance with the available RK methods, or]{.s1}
+-   [Introduce heuristics for choosing an appropriate RK method, using
+    knowledge of the accuracy requirements and the length of the current
+    step, and the characteristics of the magnetic field.]{.s1}
+
+[**Expected results:** Working implementation of a) one or more
+multi-step integration methods inside Geant4 and/or Geant4 module for
+tracking in field, or b) integration methods which combine RK methods of
+different order for improved performance.]{.s1}
+
+[**Requirements**: This project requires prior exposure to Numerical
+Analysis and familiarity with either C++, C or Java programming.
+ Exposure to either numerical methods for solving Ordinary Differential
+equations (ODEs) or tools for analysing data such as ROOT or R will be
+valuable. Both programming skill and knowledge of numerical methods for
+ODEs will be improved by undertaking this project.]{.s1}
+
+[**Mentor**: [[John
+Apostolakis​](mailto:sft-gsoc-AT-cern-dot-ch?subject=Field%20integration)\
+**Web site**: http://cern.ch/geant4\
+**Source
+code**: ]{.s3}]{.s2}https://github.com/jonapost/field\_propagation\
+\
+\
+ 
+
+ROOT 
+-----
+
+ 
+
+The ROOT system ([root.cern.ch](http://root.cern.ch)) provides a set of
+OO frameworks with all the functionality needed to handle and analyze
+large amounts of data in a very efficient way. Having the data defined
+as a set of objects, specialized storage methods are used to get direct
+access to the separate attributes of the selected objects, without
+having to touch the bulk of the data. Included are histogramming methods
+in an arbitrary number of dimensions, curve fitting, function
+evaluation, minimization, graphics and visualization classes to allow
+the easy setup of an analysis system that can query and process the data
+interactively or in batch mode, as well as a general parallel processing
+framework, PROOF, that can considerably speed up an analysis. Thanks to
+the built-in C++ interpreter the command language, the scripting, or
+macro, language and the programming language are all C++. The
+interpreter allows for fast prototyping of the macros since it removes
+the, time consuming, compile/link cycle. It also provides a good
+environment to learn C++. If more performance is needed the
+interactively developed macros can be compiled. ROOT\'s new C++11
+standard-compliant interpreter is Cling, an interpreter built on top of
+Clang (www.clang.llvm.org (link is external)) and LLVM (www.llvm.org
+(link is external)) compiler infrastructure. Cling is being developed at
+CERN as a standalone project. It is being integrated into the ROOT data
+analysis (root.cern.ch) framework, giving ROOT access to an C++11
+standards compliant interpreter. ROOT is an open system that can be
+dynamically extended by linking external libraries. This makes ROOT a
+premier platform on which to build data acquisition, simulation and data
+analysis systems. ROOT is the de-facto standard data storage and
+processing system for all High Energy Phyiscs labs and experiments world
+wide. It is also being used in other fields of science and beyond (e.g.
+finance, insurance, etc).
+
+### **Enhance C-Reduce to work with ROOT**
+
+ 
+
+**Description:**
+
+C-Reduce (<https://github.com/csmith-project/creduce>), is a tool which
+aims to reduce bug reports. It transforms user\'s source files to make
+them as minimal as possible. Minimalistic bug reproducers are easy to
+debug and convert into regression tests. C-Reduce is fairly mature and
+well adapted to minimize crashes in compilers. The project will be
+mainly focused towards making C-Reduce easier to use with ROOT and it\'s
+interactive C++ interpreter cling.
+
+ 
+
+**Expected results:** Extend C-Reduce to be able to reduce easily ROOT
+bug reports. Optionally extend C-Reduce to minimize ROOT\'s data files.
+Implement tests for all the realized functionality. Prepare a final
+poster of the work and be ready to present it.
+
+**Required knowledge:** Intermediate level of C++, some experience with
+Clang
+
+**Mentor:**[Vassil
+Vassilev](mailto:sft-gsoc-AT-cern-dot-ch?subject=C-Reduce)
+
+### Extend clad - The Automatic Differentiation
+
+**Description:** In mathematics and computer algebra, automatic
+differentiation (AD) is a set of techniques to numerically evaluate the
+derivative of a function specified by a computer program. Automatic
+differentiation is an alternative technique to Symbolic differentiation
+and Numerical differentiation (the method of finite differences). Clad
+(<https://github.com/vgvassilev/clad>) is based on Clang which will
+provides the necessary facilities for code transformation. The AD
+library is able to differentiate non trivial functions, to find a
+partial derivative for trivial cases and has good unit test coverage.
+There was a proof-of-concept implementation for computation offload
+using OpenCL.
+
+**Expected results:**The student should teach AD how to generate
+OpenCL/CUDA code automatically for a given derivative. The
+implementation should be very well tested and documented. Prepare a
+final poster of the work and be ready to present it.
+
+**Required knowledge:** Advanced C++, Clang abstract syntax tree (AST),
+CUDA/OpenCL basic math.
+
+**Mentor:**[Vassil
+Vassilev](mailto:sft-gsoc-AT-cern-dot-ch?subject=Automatic%20Differentiation)
+
+Interactive features for the JSROOT web geometry viewer
+-------------------------------------------------------
+
+**Description:** The ROOT project is developing a JavaScript library
+reading and rendering ROOT objects (1D, 2D, 3D histograms, 1D & 2D
+graphs, multi-graphs, 3D geometries) in any modern web browser. One part
+of this task is to render 3D objects (like detector geometries) using
+the THREE.js library. This is advancing rapidly and most of the shapes
+have been implemented. Nevertheless, many interactive features are
+missing, such as navigation/selection of volumes (picking) and
+introducing/moving cutting plane. This has to be implemented. And the
+current code can handle and display several hundred of volumes, but
+typical detector geometries can be composed of several millions of
+volumes. The code should be able to deal with such big geometry (memory
+and performance wise). See the JSROOT page and actual status
+[here](https://root.cern.ch/js/).
+
+**Expected results:**
+
+-   Provide more interactive features to web geometry viewer
+-   Performance optimization for large geometries
+
+ 
+
+**Required knowledge:**Good knowledge of JavaScript. Experience with 3D
+computer graphics. Knowledge of C++ would be an asset
+
+**Mentor:**[Bertrand Bellenot and Sergei
+Linev](mailto:sft-gsoc-AT-cern-dot-ch?subject=Interactive%20features%20for%20the%20JSROOT%20web%20geometry%20viewer)
+
+ 
+
+TMVA Project in Machine Learning
+--------------------------------
+
+**Description**: Toolkit for Multivariate Analyses (TMVA) is a
+machine-learning framework integrated into the ROOT software framework,
+containing ML packages for classification and regression frequently used
+by high-energy physicists in searches for new particles, used for
+example in the discovery of the Higgs Boson. Recently TMVA has been
+undergoing a significant makeover both in performance, features and
+functionality.\
+\
+There are a number of possible areas of contribution, for example:
+
+**Task ideas**
+
+-   Improvement of memory management and data-handling for parallel
+    running
+
+-   GPU support for intensive deep learning training applications
+
+-   Interfaces to other machine-learning tools
+
+-   Support for multi-objective regression
+
+-   Support for feature engineering
+
+\
+**Expected Results**: working implementation of these features in TMVA
+leading to improved software performance\
+\
+**Requirements**: Strong C++ background is desired, strong machine
+learning knowledge is a plus. \
+\
+**GitHub
+repository**: [TMVA](https://github.com/root-mirror/root/tree/master/tmva){.moz-txt-link-freetext}\
+\
+**Mentors**: [[[Sergei
+Gleyzer​](mailto:sergei-AT-cern-dot-ch?subject=TMVA%20Machine%20Learning)]{.s3}]{.s2},
+[[[Lorenzo
+Moneta](mailto:sft-gsoc-AT-cern-dot-ch?subject=TMVA%20Machine%20Learning)]{.s3}]{.s2}\
+ 
+
+Integrating Machine Learning in Jupyter Notebooks
+-------------------------------------------------
+
+\
+**Description**: Improving user experience with ROOTbooks and TMVA. A
+ROOTbook is a ROOT-integrated Jupyter notebook. ROOT is a software
+framework for data processing, analysis, storage and visualization.
+Toolkit for Multivariate Analysis (TMVA) is a ROOT-integrated package of
+Machine Learning tools. Jupyter notebook is a web-based interactive
+computing platform that combines code, equations, text and
+visualizations.\
+\
+**Task ideas**:
+
+-   Integrate a list of features, currently available in the TMVA
+    Graphical User Interface, into the ROOTbook environment. This
+    includes Receiver Operating Characteristic (ROC) curves, feature
+    correlations, overtraining checks and classifier visualizations.
+-   Extend the ROOT-Python binding (or PyROOT) for the use of TMVA in
+    ROOTbooks. This includes simplifying parameter specification for
+    booking and training classifiers, improving output readability and
+    code clarity.
+-   Implement interactive training mode in the ROOTbook environment.
+-   Interactive feature engineering with JavaScript visualization.
+-   Interactive deep learning optimization.
+
+\
+**Expected results**: working implementation of the TMVA-ROOTbooks
+integration layer.\
+\
+**Requirements**: Python, C++, Javascript, machine learning, familiarity
+with notebook technology is a plus\
+\
+**Links**:
+[TMVA](https://github.com/root-mirror/root/tree/master/tmva){.moz-txt-link-freetext},
+[ROOTbooks](https://github.com/cernphsft/rootbinder){.moz-txt-link-freetext}\
+\
+**Mentors**: [[[Sergei
+Gleyzer​](mailto:sergei-AT-cern-dot-ch?subject=Integrating%20Machine%20Learning%20in%20Jupyter%20Notebooks)]{.s3}]{.s2}
+and  [[[Enric
+Tejedor](mailto:etejedor-AT-cern-dot-ch?subject=Integrating%20Machine%20Learning%20in%20Jupyter%20Notebooks)]{.s3}]{.s2}
+
+ 
+-
+
+Reflection-based Python-C++ language bindings: cppyy
+----------------------------------------------------
+
+cppyy is a fully automated, run-time, language bridge between C++ and
+Python. It forms the underpinnings for PyROOT, the Python bindings to
+ROOT, the main persistency and analysis framework in High Energy Physics
+(HEP), is used to drive the frameworks of several HEP experiments, and
+is the environment of choice for analysis for many HEP physicists. cppyy
+is the only Python-C++ bindings technology that can handle the scale,
+complexity, and heterogeneity of HEP codes. There are two
+implementations, one for CPython, and one for PyPy.
+
+Source codes, documentation, and downloads: https://root.cern.ch/  and
+ https://pypy.org/
+
+Both the CPython and PyPy implementations support the CINT and Reflex
+reflection systems, the CPython version also supports Cling, which is
+based on Clang/LLVM. The goal is to move both to Cling on a code base
+that is as much shared as possible.
+
+ 
+
+### Integrate the Cling backend into PyPy/cppyy
+
+**Description:** Cling, being based on Clang/LLVM can parse the latest
+C++ standard (C++11/C++14). A Cling backend exists for CPython/cppyy,
+but not yet for PyPy/cppyy. A common backend could serve both projects,
+and would reduce the cost of new features, making them much quicker
+available.
+
+**Expected results:** Implement a Cling backend on libCling directly,
+using the CPython implementation as a starting point, for use by both
+CPython and PyPy. Package this backend for distribution. Design and
+implement a method for distribution of Clang modules with the standard
+Python distribution tools.
+
+**Requirements:** Working knowledge of C++, good knowledge of Python
+
+**Mentor:** [Wim
+Lavrijsen](mailto:sft-gsoc-AT-cern-dot-ch?subject=%20ClingAndPyPy%20)
+
+Sixtrack numerical accelerator simulation​
+------------------------------------------
+
+[SixTrack](http://cern.ch/sixtrack) is a software for simulating and
+analysing the trajectory of high energy particles in accelerators. It
+has been used in the design and optimization of the LHC and is now being
+used to design the High-Luminosity LHC (HL-LHC) upgrade that will be
+installed in the next decade. Sixtrack has been adapted to take
+advantage of large scale volunteer computing resources provided by
+the [LHC\@Home](http://sixtrack.web.cern.ch/SixTrack/www/cern.ch/lhcathome) project.
+It has been engineered to give the exact same results after millions of
+operations on several, very different computer platforms. The source
+code is written in Fortran, and is pre-processed by two programs that
+assemble the code blocks and provide automatic differentiation of the
+equation of motions. The code relies on the [crlibm[[ (link is
+external)]{.element-invisible}]{.ext}](http://lipforge.ens-lyon.fr/www/crlibm/){.ext} library,
+careful arrangement of parenthesis, dedicated input/output and selected
+compilation flags for the most common compilers to provide identical
+results on different platforms and operating systems. An option enables
+the use of the [Boinc[[ (link is
+external)]{.element-invisible}]{.ext}](http://boinc.berkeley.edu/){.ext} library
+for volunteer computing. A running environment SixDesk is used to
+generate input files, split simulations for [LHC\@Home[[ (link sends
+e-mail)]{.element-invisible}]{.mailto}](mailto:LHC@Home){.mailto} or
+CERN cluster and collect the results for the user. SixTrack is licensed
+under LGPLv2.1.
+
+A strong background in computer science and programming languages as
+well the interest to understand computational physics methods
+implemented in the code are sought. The unique challenge will be offered
+to work with a high-performance production code that is used for the
+highest energy accelerator in the world - and thus the code\'s
+reliability and backward compatibility cannot be compromised. There will
+be the opportunity to learn about methods used in simulating the motion
+of particles in accelerators.
+
+ 
+
+### Optimize and Integrate Standalone Tracking Library (SixTrackLib)
+
+**Description**: Benchmark a standalone tracking library in C targeting
+both CPU and GPU and integrate in SixTrack. The inner loop uses a simple
+data structure based on contiguous arrays that can be generated by
+SixTrack or external programs and can be hosted in the CPU or GPU main
+memory. In case of GPU, the ideal number of particle per core (even one
+such that coordinates do not leave internal registers) and kernel size
+should be evaluated for speed.
+
+**Expected results: **Running code which rely only on the newly
+rewritten library to perform tracking simulations and test suite that
+proves that old and new implementation produce identical results.
+
+**Mentors: **[Ricardo De Maria[[ (link sends
+e-mail)]{.element-invisible}]{.mailto}](mailto:sft-gsoc-AT-cern-dot-ch?subject=%5BGSoC%202014%5D%20SixTrack%20-%20Standalone%20Tracking%20Library%20){.mailto}
+
+**Requirements**: Experience with Fortran, C, OpenCL, calculus and a
+background in physics. 
+
+### New physics models
+
+**Description:** Implement, test and put in production a new solvers for
+exact bending dipoles, combined function magnets and radiation effects.
+
+**Expected results:** The user can build accelerator simulations with
+more accurate models for low energy machines and/or machines with
+radiation effects.
+
+**Mentors: **[Ricardo De Maria [[(link sends
+e-mail)]{.element-invisible}]{.mailto}](mailto:sft-gsoc-AT-cern-dot-ch?subject=%5BGSoC%202014%5D%20SixTrack%20-%20New%20Physics%20Models){.mailto}
+
+**Requirements:** Fortran, calculus, accelerator physics.
+
+BLonD
+-----
+
+The CERN Beam Longitudinal Dynamics code,
+[BLonD](http://blond.web.cern.ch/), is used to simulate the dynamics of
+particle bunches in synchrotrons. It contains a vast range of different
+physics features to model multiple-harmonic RF systems, feedback loops,
+and collective effects, and has been applied for many studies and
+several machines in- and outside of CERN. Whether it is to understand
+previously unexplained observations, or whether it is to predict and
+optimize parameters for future, simulations often require multi-bunch
+modelling with millions of particles and calculations of collective
+effects (in frequency or time domain), sometimes over millions of
+iterations, which can make the simulations computationally very
+expensive.
+
+### BLonD Code Optimisation
+
+**Description:** The code was originally written in python. In order to
+significantly reduce the runtime, it will be translated to C++ and
+algorithms are going to optimized by a BLonD developer during the coming
+year. This will not only require a complete rewriting, but also a major
+restructuring of the code, where creativity, initiative, and latest
+technologies will be needed. As a Gsoc student, you could contribute to
+explore different parallelization techniques on CPUs and GPUs for
+different parts of the code, as well as different data structures and
+overall software architecture options to increase computational
+efficiency.
+
+**Expected results:** Determine the best architecture and
+parallelization option(s) for the BLonD code.
+
+**Requirements:** Strong skills in C++ and parallelization techniques.
+Some experience with python would be of advantage. Furthermore, a
+minimal physics background that allows for understanding the underlying
+equations.
+
+**Mentors:** [Helga Timko and Danilo
+Piparo](mailto:sft-gsoc-AT-cern-dot-ch?subject=BLonD%20code%20optimisation)
+
+**Website **(with links to source code & documentation):
+<http://blond.web.cern.ch/>
+
+ 
+
+[\'Blue sky\' ideas]{#bluesky}
+==============================
+
+Improvement of the VDT Mathematical Library
+-------------------------------------------
+
+The [VDT[[ (link is
+external)]{.element-invisible}]{.ext}](https://github.com/dpiparo/vdt){.ext}
+mathematical library is a collection of optimised, inline and
+vectorisable mathematical functions. Its adoption allowed to reduce
+remarkably the runtime of the data processing workflows of CMS
+experiment at the LHC.
+
+This project aims to further expand the functionality of the [VDT[[
+(link is
+external)]{.element-invisible}]{.ext}](https://github.com/dpiparo/vdt){.ext}
+mathematical library. Two main areas can be explored, namely:
+
+### 1. Integration with OMP4 and support for simd vectors
+
+The VDT functions can be enhanced in order to support the OpenMP4
+programming interface relative to vectorisation. In additon, by
+templating the [VDT[[ (link is
+external)]{.element-invisible}]{.ext}](https://github.com/dpiparo/vdt){.ext}
+functions, the explicit vectorisation through the usage of array types
+such as the gcc and clang built-in types or the Vc array types.
+
+### 2. Integration of existing limited precision/domain function implementations
+
+Often the usage of a certain mathematical function requires the support
+of a limited domain or a limited precision. This activity aims to
+complement the existing [VDT[[ (link is
+external)]{.element-invisible}]{.ext}](https://github.com/dpiparo/vdt){.ext}
+functions implementations with others characterized by a reduced
+precision or input range. An appropriate formulation of the interfaces
+of these functions has to be adopted, for example adopting generic
+programming principles through the usage of templates.\
+\
+**Mentors:** Vincenzo Innocente, Danilo Piparo
+
+[Mentors]{#mentors}
+===================
+
+Here is the list of our mentors and their areas of expertise:
+
+-   [Lorenzo
+    Moneta](mailto:sft-gsoc-AT-cern-DOT-ch?subject=GSOC%2015%general)
+    (programme administrator; ROOT)
+-   [Sergei
+    Gleyzer](mailto:sft-gsoc-AT-cern-DOT-ch?subject=GSOC%2015%general)
+    (programme administrator; Machine Learning)
+-   [Vasil Vasilev](mailto:sft-gsoc-AT-cern-dot-ch) (ROOT)
+-   [Danilo Piparo](mailto:sft-gsoc-AT-cern-dot-ch) (ROOT)
+-   [Bertrand Bellenot](mailto:sft-gsoc-AT-cern-dot-ch) (ROOT)
+-   [Sergey Linev](mailto:sft-gsoc-AT-cern-dot-ch) (ROOT, JavaScript)
+-   [Andrei
+    Gheata](mailto:sft-gsoc-AT-cern-dot-ch?subject=%5BGSoC%202016%5D%20-%20Simulation%20GeantV) (Simulation)
+-   [John
+    Apostolakis](mailto:sft-gsoc-AT-cern-dot-ch?subject=%5BGSoC%202016%5D%20-%20Simulation%20Integration)
+    (Simulation)
+-   [Riccardo De Maria](mailto:sft-gsoc-AT-cern-dot-ch) (Sixtrack)
+-   [Helga Timko](mailto:sft-gsoc-AT-cern-dot-ch) (BlonD)
+-   [Wim Lavrijsen](mailto:sft-gsoc-AT-cern-dot-ch) (PyROOT)
+
+[Contact information]{#contact}
+===============================
+
+Please do not hesitate to contact us if you are planning to apply for
+any of the above projects:
+
+-   SFT GSoC mailing list:
+    [sft-gsoc-AT-cern-DOT-ch](mailto:sft-gsoc-AT-cern-DOT-ch?subject=GSOC%2012)
+    (no subscription needed).
